@@ -1,0 +1,5 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+//mỗi khi lưu file thì sẽ sử dụng format code prettier và đọc lại file .prettierrc
