@@ -36,6 +36,7 @@ function Menu({ children, items = [], onChange = defaultFn }) {
         <Tippy
             interactive
             delay={[0, 1000]} //show ngay và ẩn sau 500ms
+            offset={[12, 8]} // trái: chiều ngang, phải : chiều cao
             placement="bottom-end"
             render={(attrs) => (
                 <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
@@ -52,6 +53,7 @@ function Menu({ children, items = [], onChange = defaultFn }) {
                     </PopperWrapper>
                 </div>
             )}
+            onHide={() => setHistory((prev) => prev.slice(0, 1))} // khi bấm chuyển sang ngôn ngữ khác và di chuột ra ngoài thì nó sẽ tự động về giao diện đầu tiên của menu-list
         >
             {children}
         </Tippy>
