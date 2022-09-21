@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
 import AccountItem from '~/components/AccountItem';
 import { SearchIcon } from '~/components/Icons';
+import { useDebounce } from '~/hooks';
 import styles from './Search.module.scss';
 const cx = classNames.bind(styles);
 
@@ -14,17 +15,22 @@ function Search() {
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(true); // kiểm tra trạng thái có đang focus vào input hay không
     const [loading, setLoading] = useState(false);
+
+    // lần đầu tiên chạy debounced có giá trị ''
+    // lần 2 nhập chữ h thì lọt vào useEffect bên file useDebounce.js thì nó đã có setTimeout 500s nên nó sẽ vẫn còn là chuỗi rỗng tương tự như lần tiếp theo
+    // đến khi hoàn thành gõ thì sau 500s nó sẽ set lại debounce value và nó render lại chuỗi cuối cùng
+    const debounced = useDebounce(searchValue, 500); // truyền vào giá trị muốn delay và khoảng thời gian muốn delay
     const inputRef = useRef();
 
     useEffect(() => {
-        if (!searchValue.trim()) {
+        if (!debounced.trim()) {
             setSearchResult([]);
             return;
         }
         setLoading(true); // trước khi gõ api set loading lại true
 
         //encodeURIComponent để mã hoá các ký tự đặc biệt gây hiểu lầm trên URL thành ký tự hợp lệ vd : &,...
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`)
+        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounced)}&type=less`)
             .then((res) => res.json())
             .then((res) => {
                 setSearchResult(res.data);
@@ -33,7 +39,7 @@ function Search() {
             .catch(() => {
                 setLoading(false);
             });
-    }, [searchValue]);
+    }, [debounced]);
     const handleClear = () => {
         setSearchValue(''); // clear nội dung ô search
         setSearchResult([]);
