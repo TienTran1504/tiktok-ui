@@ -19,6 +19,7 @@
         color: var(--black);
         background-color: transparent;
         caret-color: var(--primary); // dấu nháy khi focus trong input
+        font-family: var(--font-family);
     }
 
     input:not(:placeholder-shown) ~ .search-btn {
