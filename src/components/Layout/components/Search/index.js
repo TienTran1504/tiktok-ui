@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
+import * as searchServices from '~/apiServices/searchServices';
 import { useState, useEffect, useRef } from 'react';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
 import AccountItem from '~/components/AccountItem';
@@ -27,18 +28,16 @@ function Search() {
             setSearchResult([]);
             return;
         }
-        setLoading(true); // trước khi gõ api set loading lại true
 
-        //encodeURIComponent để mã hoá các ký tự đặc biệt gây hiểu lầm trên URL thành ký tự hợp lệ vd : &,...
-        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(debounced)}&type=less`)
-            .then((res) => res.json())
-            .then((res) => {
-                setSearchResult(res.data);
-                setLoading(false); // gọi api xong set lại bằng false
-            })
-            .catch(() => {
-                setLoading(false);
-            });
+        const fetchApi = async () => {
+            setLoading(true); // trước khi gõ api set loading lại true
+
+            const result = await searchServices.search(debounced);
+            setSearchResult(result);
+
+            setLoading(false);
+        };
+        fetchApi();
     }, [debounced]);
     const handleClear = () => {
         setSearchValue(''); // clear nội dung ô search
