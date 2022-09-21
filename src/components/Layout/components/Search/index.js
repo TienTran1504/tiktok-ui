@@ -13,14 +13,27 @@ function Search() {
     const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(true); // kiểm tra trạng thái có đang focus vào input hay không
-
+    const [loading, setLoading] = useState(false);
     const inputRef = useRef();
 
     useEffect(() => {
-        setTimeout(() => {
-            setSearchResult([1, 2, 3]);
-        }, 0);
-    }, []);
+        if (!searchValue.trim()) {
+            setSearchResult([]);
+            return;
+        }
+        setLoading(true); // trước khi gõ api set loading lại true
+
+        //encodeURIComponent để mã hoá các ký tự đặc biệt gây hiểu lầm trên URL thành ký tự hợp lệ vd : &,...
+        fetch(`https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(searchValue)}&type=less`)
+            .then((res) => res.json())
+            .then((res) => {
+                setSearchResult(res.data);
+                setLoading(false); // gọi api xong set lại bằng false
+            })
+            .catch(() => {
+                setLoading(false);
+            });
+    }, [searchValue]);
     const handleClear = () => {
         setSearchValue(''); // clear nội dung ô search
         setSearchResult([]);
@@ -39,9 +52,9 @@ function Search() {
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
                     <PopperWrapper>
                         <h4 className={cx('search-title')}>Account</h4>
-                        <AccountItem />
-                        <AccountItem />
-                        <AccountItem />
+                        {searchResult.map((result) => (
+                            <AccountItem key={result.id} data={result} />
+                        ))}
                     </PopperWrapper>
                 </div>
             )}
@@ -56,12 +69,14 @@ function Search() {
                     onChange={(e) => setSearchValue(e.target.value)}
                     onFocus={() => setShowResult(true)}
                 />
-                {!!searchValue && (
-                    <button className={cx('clear')} onClick={handleClear}>
-                        <FontAwesomeIcon icon={faCircleXmark} />
-                    </button>
-                )}
-                {/* <FontAwesomeIcon className={cx('loading')} icon={faSpinner} /> */}
+                {!!searchValue &&
+                    !loading && ( // nếu có nhập ký tự hay loading đang không chạy thì hiện nút close
+                        <button className={cx('clear')} onClick={handleClear}>
+                            <FontAwesomeIcon icon={faCircleXmark} />
+                        </button>
+                    )}
+                {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}
+
                 <button className={cx('search-btn')}>
                     <SearchIcon />
                 </button>
