@@ -24,7 +24,7 @@ function AccountItem({ data }) {
 }
 
 AccountItem.propTypes = {
-    data: PropTypes.object,
+    data: PropTypes.object.isRequired,
 };
 export default AccountItem;
 //Xử lý Account item ở mục lịch sử tìm kiếm
