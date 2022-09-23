@@ -17,14 +17,14 @@ function Search() {
     const [showResult, setShowResult] = useState(true); // kiểm tra trạng thái có đang focus vào input hay không
     const [loading, setLoading] = useState(false);
 
-    // lần đầu tiên chạy debounced có giá trị ''
+    // lần đầu tiên chạy debouncedValue có giá trị ''
     // lần 2 nhập chữ h thì lọt vào useEffect bên file useDebounce.js thì nó đã có setTimeout 500s nên nó sẽ vẫn còn là chuỗi rỗng tương tự như lần tiếp theo
     // đến khi hoàn thành gõ thì sau 500s nó sẽ set lại debounce value và nó render lại chuỗi cuối cùng
-    const debounced = useDebounce(searchValue, 500); // truyền vào giá trị muốn delay và khoảng thời gian muốn delay
+    const debouncedValue = useDebounce(searchValue, 500); // truyền vào giá trị muốn delay và khoảng thời gian muốn delay
     const inputRef = useRef();
 
     useEffect(() => {
-        if (!debounced.trim()) {
+        if (!debouncedValue.trim()) {
             setSearchResult([]);
             return;
         }
@@ -32,13 +32,13 @@ function Search() {
         const fetchApi = async () => {
             setLoading(true); // trước khi gõ api set loading lại true
 
-            const result = await searchServices.search(debounced);
+            const result = await searchServices.search(debouncedValue);
             setSearchResult(result);
 
             setLoading(false);
         };
         fetchApi();
-    }, [debounced]);
+    }, [debouncedValue]);
     const handleClear = () => {
         setSearchValue(''); // clear nội dung ô search
         setSearchResult([]);

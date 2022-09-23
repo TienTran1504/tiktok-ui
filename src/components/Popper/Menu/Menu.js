@@ -33,6 +33,24 @@ function Menu({ children, items = [], hideOnClick = false, onChange = defaultFn 
         });
     };
 
+    const handleBack = () => {
+        setHistory((prev) => prev.slice(0, prev.length - 1));
+    };
+
+    const renderResult = (attrs) => (
+        <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
+            <PopperWrapper className={cx('menu-popper')}>
+                {history.length > 1 && <Header title={current.title} onBack={handleBack} />}
+                <div className={cx('menu-body')}>{renderItems()}</div>
+            </PopperWrapper>
+        </div>
+    );
+
+    // khi bấm chuyển sang ngôn ngữ khác và di chuột ra ngoài thì nó sẽ tự động về giao diện đầu tiên của menu-list
+    const handleResetMenu = () => {
+        setHistory((prev) => prev.slice(0, 1));
+    };
+
     return (
         <Tippy
             interactive
@@ -40,22 +58,8 @@ function Menu({ children, items = [], hideOnClick = false, onChange = defaultFn 
             offset={[12, 8]} // trái: chiều ngang, phải : chiều cao
             hideOnClick={hideOnClick}
             placement="bottom-end"
-            render={(attrs) => (
-                <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
-                    <PopperWrapper className={cx('menu-popper')}>
-                        {history.length > 1 && (
-                            <Header
-                                title={current.title}
-                                onBack={() => {
-                                    setHistory((prev) => prev.slice(0, prev.length - 1));
-                                }}
-                            />
-                        )}
-                        <div className={cx('menu-body')}>{renderItems()}</div>
-                    </PopperWrapper>
-                </div>
-            )}
-            onHide={() => setHistory((prev) => prev.slice(0, 1))} // khi bấm chuyển sang ngôn ngữ khác và di chuột ra ngoài thì nó sẽ tự động về giao diện đầu tiên của menu-list
+            render={renderResult}
+            onHide={handleResetMenu}
         >
             {children}
         </Tippy>
